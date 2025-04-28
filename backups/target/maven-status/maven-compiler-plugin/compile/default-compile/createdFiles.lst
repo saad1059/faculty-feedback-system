@@ -1,0 +1,5 @@
+com\ffms\model\Student.class
+com\ffms\model\Feedback.class
+com\ffms\model\Faculty.class
+com\ffms\controller\AuthController.class
+com\ffms\FacultyFeedbackSystemApplication.class

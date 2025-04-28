@@ -1,0 +1,7 @@
+com\ffms\model\Student.class
+com\ffms\model\Feedback.class
+com\ffms\FacultyFeedbackSystemApplication.class
+com\ffms\repository\FacultyRepository.class
+com\ffms\model\Faculty.class
+com\ffms\repository\StudentRepository.class
+com\ffms\controller\AuthController.class
