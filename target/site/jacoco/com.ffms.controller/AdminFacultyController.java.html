@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminFacultyController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">faculty-feedback-system</a> &gt; <a href="index.source.html" class="el_package">com.ffms.controller</a> &gt; <span class="el_source">AdminFacultyController.java</span></div><h1>AdminFacultyController.java</h1><pre class="source lang-java linenums">package com.ffms.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.ffms.model.Faculty;
+import com.ffms.service.FacultyService;
+import com.ffms.service.SubjectService;
+import com.ffms.exception.RegistrationException;
+
+import jakarta.servlet.http.HttpSession;
+
+@Controller
+@RequestMapping(&quot;/admin/faculty&quot;)
+<span class="nc" id="L18">public class AdminFacultyController {</span>
+
+    @Autowired
+    private FacultyService facultyService;
+
+    @Autowired
+    private SubjectService subjectService;
+
+    @GetMapping
+    public String listFaculty(Model model, HttpSession session) {
+<span class="nc bnc" id="L28" title="All 2 branches missed.">        if (session.getAttribute(&quot;adminId&quot;) == null) {</span>
+<span class="nc" id="L29">            return &quot;redirect:/admin/login&quot;;</span>
+        }
+<span class="nc" id="L31">        model.addAttribute(&quot;faculties&quot;, facultyService.getAllFaculties());</span>
+<span class="nc" id="L32">        return &quot;admin/faculty/list&quot;;</span>
+    }
+
+    @GetMapping(&quot;/register&quot;)
+    public String showRegisterForm(Model model, HttpSession session) {
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (session.getAttribute(&quot;adminId&quot;) == null) {</span>
+<span class="nc" id="L38">            return &quot;redirect:/admin/login&quot;;</span>
+        }
+<span class="nc" id="L40">        model.addAttribute(&quot;faculty&quot;, new Faculty());</span>
+<span class="nc" id="L41">        return &quot;admin/faculty/register&quot;;</span>
+    }
+
+    @PostMapping(&quot;/register&quot;)
+    public String registerFaculty(@ModelAttribute Faculty faculty, 
+                                RedirectAttributes redirectAttributes,
+                                HttpSession session) {
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (session.getAttribute(&quot;adminId&quot;) == null) {</span>
+<span class="nc" id="L49">            return &quot;redirect:/admin/login&quot;;</span>
+        }
+        
+        try {
+<span class="nc" id="L53">            facultyService.registerFaculty(faculty);</span>
+<span class="nc" id="L54">            redirectAttributes.addFlashAttribute(&quot;success&quot;, &quot;Faculty member added successfully!&quot;);</span>
+<span class="nc" id="L55">            return &quot;redirect:/admin/faculty&quot;;</span>
+<span class="nc" id="L56">        } catch (RegistrationException e) {</span>
+<span class="nc" id="L57">            redirectAttributes.addFlashAttribute(&quot;error&quot;, e.getMessage());</span>
+<span class="nc" id="L58">            return &quot;redirect:/admin/faculty/register&quot;;</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public String viewFaculty(@PathVariable Long id, Model model, HttpSession session) {
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (session.getAttribute(&quot;adminId&quot;) == null) {</span>
+<span class="nc" id="L65">            return &quot;redirect:/admin/login&quot;;</span>
+        }
+<span class="nc" id="L67">        model.addAttribute(&quot;faculty&quot;, facultyService.getFacultyById(id));</span>
+<span class="nc" id="L68">        return &quot;admin/faculty/view&quot;;</span>
+    }
+
+    @GetMapping(&quot;/{id}/edit&quot;)
+    public String showEditForm(@PathVariable Long id, Model model, HttpSession session) {
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (session.getAttribute(&quot;adminId&quot;) == null) {</span>
+<span class="nc" id="L74">            return &quot;redirect:/admin/login&quot;;</span>
+        }
+<span class="nc" id="L76">        model.addAttribute(&quot;faculty&quot;, facultyService.getFacultyById(id));</span>
+<span class="nc" id="L77">        return &quot;admin/faculty/edit&quot;;</span>
+    }
+
+    @PostMapping(&quot;/{id}/edit&quot;)
+    public String updateFaculty(@PathVariable Long id, 
+                              @ModelAttribute Faculty faculty,
+                              RedirectAttributes redirectAttributes,
+                              HttpSession session) {
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        if (session.getAttribute(&quot;adminId&quot;) == null) {</span>
+<span class="nc" id="L86">            return &quot;redirect:/admin/login&quot;;</span>
+        }
+        
+        try {
+<span class="nc" id="L90">            faculty.setId(id);</span>
+<span class="nc" id="L91">            facultyService.updateFaculty(faculty);</span>
+<span class="nc" id="L92">            redirectAttributes.addFlashAttribute(&quot;success&quot;, &quot;Faculty member updated successfully!&quot;);</span>
+<span class="nc" id="L93">            return &quot;redirect:/admin/faculty&quot;;</span>
+<span class="nc" id="L94">        } catch (RegistrationException e) {</span>
+<span class="nc" id="L95">            redirectAttributes.addFlashAttribute(&quot;error&quot;, e.getMessage());</span>
+<span class="nc" id="L96">            return &quot;redirect:/admin/faculty/&quot; + id + &quot;/edit&quot;;</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/delete&quot;)
+    public String deleteFaculty(@PathVariable Long id,
+                              RedirectAttributes redirectAttributes,
+                              HttpSession session) {
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        if (session.getAttribute(&quot;adminId&quot;) == null) {</span>
+<span class="nc" id="L105">            return &quot;redirect:/admin/login&quot;;</span>
+        }
+        
+        try {
+<span class="nc" id="L109">            facultyService.deleteFaculty(id);</span>
+<span class="nc" id="L110">            redirectAttributes.addFlashAttribute(&quot;success&quot;, &quot;Faculty member deleted successfully!&quot;);</span>
+<span class="nc" id="L111">        } catch (Exception e) {</span>
+<span class="nc" id="L112">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;Error deleting faculty member: &quot; + e.getMessage());</span>
+<span class="nc" id="L113">        }</span>
+<span class="nc" id="L114">        return &quot;redirect:/admin/faculty&quot;;</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

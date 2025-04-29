@@ -40,6 +40,36 @@
     </style>
 </head>
 <body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">FFMS Student</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/student/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/student/enroll">Enroll in Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/student/feedback">Feedback</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/student/profile">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/student/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-4">
         <div class="dashboard-header">
             <h2>Welcome, <span th:text="${studentName}">Student</span>!</h2>
@@ -85,23 +115,22 @@
             <h3>My Enrolled Courses</h3>
             <div class="card">
                 <div class="card-body">
-                    <ul class="subject-list">
-                        <li class="subject-item">
+                    <div th:if="${enrolledSubjects.empty}" class="text-muted">No courses enrolled yet</div>
+                    <ul class="subject-list" th:if="${!enrolledSubjects.empty}">
+                        <li class="subject-item" th:each="subject : ${enrolledSubjects}">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h5 class="mb-1">Introduction to Programming</h5>
-                                    <p class="mb-0 text-muted">Prof. John Doe</p>
+                                    <h5 class="mb-1" th:text="${subject.subjectName}">Course Name</h5>
+                                    <p class="mb-0 text-muted" th:text="${subject.subjectCode}">Course Code</p>
+                                    <div class="mt-2">
+                                        <small class="text-muted">Faculty:</small>
+                                        <div th:each="faculty : ${subject.faculties}">
+                                            <small th:text="${faculty.name}">Faculty Name</small>
+                                            <a th:href="@{/feedback/student/form/{facultyId}/{subjectId}(facultyId=${faculty.id}, subjectId=${subject.id})}" 
+                                               class="btn btn-primary btn-sm">Give Feedback</a>
+                                        </div>
+                                    </div>
                                 </div>
-                                <a href="/student/feedback/1" class="btn btn-outline-primary">Give Feedback</a>
-                            </div>
-                        </li>
-                        <li class="subject-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="mb-1">Database Management</h5>
-                                    <p class="mb-0 text-muted">Prof. Jane Smith</p>
-                                </div>
-                                <a href="/student/feedback/2" class="btn btn-outline-primary">Give Feedback</a>
                             </div>
                         </li>
                     </ul>

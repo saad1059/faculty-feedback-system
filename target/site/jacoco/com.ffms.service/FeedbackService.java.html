@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FeedbackService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">faculty-feedback-system</a> &gt; <a href="index.source.html" class="el_package">com.ffms.service</a> &gt; <span class="el_source">FeedbackService.java</span></div><h1>FeedbackService.java</h1><pre class="source lang-java linenums">package com.ffms.service;
+
+import com.ffms.model.Faculty;
+import com.ffms.model.Feedback;
+import com.ffms.model.Student;
+import com.ffms.model.Subject;
+import com.ffms.repository.FeedbackRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+<span class="nc" id="L16">public class FeedbackService {</span>
+
+    @Autowired
+    private FeedbackRepository feedbackRepository;
+
+    public Feedback submitFeedback(Feedback feedback) {
+<span class="nc" id="L22">        feedback.setSubmissionDate(LocalDateTime.now());</span>
+        
+        // Set rating based on overall rating
+<span class="nc bnc" id="L25" title="All 6 branches missed.">        switch (feedback.getOverallRating()) {</span>
+            case &quot;STRONGLY_AGREE&quot;:
+<span class="nc" id="L27">                feedback.setRating(5);</span>
+<span class="nc" id="L28">                break;</span>
+            case &quot;AGREE&quot;:
+<span class="nc" id="L30">                feedback.setRating(4);</span>
+<span class="nc" id="L31">                break;</span>
+            case &quot;NEUTRAL&quot;:
+<span class="nc" id="L33">                feedback.setRating(3);</span>
+<span class="nc" id="L34">                break;</span>
+            case &quot;DISAGREE&quot;:
+<span class="nc" id="L36">                feedback.setRating(2);</span>
+<span class="nc" id="L37">                break;</span>
+            case &quot;STRONGLY_DISAGREE&quot;:
+<span class="nc" id="L39">                feedback.setRating(1);</span>
+<span class="nc" id="L40">                break;</span>
+            default:
+<span class="nc" id="L42">                feedback.setRating(0);</span>
+        }
+        
+<span class="nc" id="L45">        return feedbackRepository.save(feedback);</span>
+    }
+
+    public List&lt;Feedback&gt; getFeedbackByFaculty(Faculty faculty) {
+<span class="nc" id="L49">        return feedbackRepository.findByFaculty(faculty);</span>
+    }
+
+    public List&lt;Feedback&gt; getFeedbackByStudent(Student student) {
+<span class="nc" id="L53">        return feedbackRepository.findByStudent(student);</span>
+    }
+
+    public List&lt;Feedback&gt; getFeedbackBySubject(Subject subject) {
+<span class="nc" id="L57">        return feedbackRepository.findBySubject(subject);</span>
+    }
+
+    public List&lt;Feedback&gt; getFeedbackByFacultyAndSubject(Faculty faculty, Subject subject) {
+<span class="nc" id="L61">        return feedbackRepository.findByFacultyAndSubject(faculty, subject);</span>
+    }
+
+    public List&lt;Feedback&gt; getAllFeedback() {
+<span class="nc" id="L65">        return feedbackRepository.findAll();</span>
+    }
+
+    public boolean hasSubmittedFeedback(Student student, Subject subject) {
+<span class="nc" id="L69">        List&lt;Feedback&gt; feedbacks = feedbackRepository.findByStudentAndSubject(student, subject);</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        if (feedbacks.isEmpty()) {</span>
+<span class="nc" id="L71">            return false;</span>
+        }
+        
+        // Get the most recent feedback
+<span class="nc" id="L75">        Feedback latestFeedback = feedbacks.stream()</span>
+<span class="nc" id="L76">            .max((f1, f2) -&gt; f1.getSubmissionDate().compareTo(f2.getSubmissionDate()))</span>
+<span class="nc" id="L77">            .orElse(null);</span>
+            
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (latestFeedback == null) {</span>
+<span class="nc" id="L80">            return false;</span>
+        }
+        
+        // Check if the latest feedback was submitted within the last 5 minutes
+<span class="nc" id="L84">        LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);</span>
+<span class="nc" id="L85">        return latestFeedback.getSubmissionDate().isAfter(fiveMinutesAgo);</span>
+    }
+
+    public Map&lt;String, Map&lt;String, Long&gt;&gt; getFeedbackMetricsByFaculty(Faculty faculty) {
+<span class="nc" id="L89">        List&lt;Feedback&gt; feedbacks = feedbackRepository.findByFaculty(faculty);</span>
+        
+<span class="nc" id="L91">        Map&lt;String, Long&gt; overallRatings = feedbacks.stream()</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">            .filter(f -&gt; f.getOverallRating() != null)</span>
+<span class="nc" id="L93">            .collect(Collectors.groupingBy(</span>
+                Feedback::getOverallRating,
+<span class="nc" id="L95">                Collectors.counting()</span>
+            ));
+
+<span class="nc" id="L98">        Map&lt;String, Map&lt;String, Long&gt;&gt; result = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L99">        result.put(&quot;overall&quot;, overallRatings);</span>
+        
+<span class="nc" id="L101">        return result;</span>
+    }
+
+    public Map&lt;String, Map&lt;String, Long&gt;&gt; getDetailedMetricsByFaculty(Faculty faculty) {
+<span class="nc" id="L105">        List&lt;Feedback&gt; feedbacks = feedbackRepository.findByFaculty(faculty);</span>
+        
+<span class="nc" id="L107">        Map&lt;String, Map&lt;String, Long&gt;&gt; metrics = new HashMap&lt;&gt;();</span>
+        
+        // Punctuality
+<span class="nc" id="L110">        metrics.put(&quot;punctuality&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">            .filter(f -&gt; f.getPunctuality() != null)</span>
+<span class="nc" id="L112">            .collect(Collectors.groupingBy(</span>
+                Feedback::getPunctuality,
+<span class="nc" id="L114">                Collectors.counting()</span>
+            )));
+            
+        // Class Participation
+<span class="nc" id="L118">        metrics.put(&quot;classParticipation&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">            .filter(f -&gt; f.getClassParticipation() != null)</span>
+<span class="nc" id="L120">            .collect(Collectors.groupingBy(</span>
+                Feedback::getClassParticipation,
+<span class="nc" id="L122">                Collectors.counting()</span>
+            )));
+            
+        // Concept Delivery
+<span class="nc" id="L126">        metrics.put(&quot;conceptDelivery&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">            .filter(f -&gt; f.getConceptDelivery() != null)</span>
+<span class="nc" id="L128">            .collect(Collectors.groupingBy(</span>
+                Feedback::getConceptDelivery,
+<span class="nc" id="L130">                Collectors.counting()</span>
+            )));
+            
+        // Fair Evaluation
+<span class="nc" id="L134">        metrics.put(&quot;fairEvaluation&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">            .filter(f -&gt; f.getFairEvaluation() != null)</span>
+<span class="nc" id="L136">            .collect(Collectors.groupingBy(</span>
+                Feedback::getFairEvaluation,
+<span class="nc" id="L138">                Collectors.counting()</span>
+            )));
+            
+        // Social Issues
+<span class="nc" id="L142">        metrics.put(&quot;socialIssues&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">            .filter(f -&gt; f.getSocialIssues() != null)</span>
+<span class="nc" id="L144">            .collect(Collectors.groupingBy(</span>
+                Feedback::getSocialIssues,
+<span class="nc" id="L146">                Collectors.counting()</span>
+            )));
+            
+        // Communication
+<span class="nc" id="L150">        metrics.put(&quot;communication&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">            .filter(f -&gt; f.getCommunication() != null)</span>
+<span class="nc" id="L152">            .collect(Collectors.groupingBy(</span>
+                Feedback::getCommunication,
+<span class="nc" id="L154">                Collectors.counting()</span>
+            )));
+            
+        // Teaching Methodology
+<span class="nc" id="L158">        metrics.put(&quot;teachingMethodology&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">            .filter(f -&gt; f.getTeachingMethodology() != null)</span>
+<span class="nc" id="L160">            .collect(Collectors.groupingBy(</span>
+                Feedback::getTeachingMethodology,
+<span class="nc" id="L162">                Collectors.counting()</span>
+            )));
+            
+        // Subject Knowledge
+<span class="nc" id="L166">        metrics.put(&quot;subjectKnowledge&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">            .filter(f -&gt; f.getSubjectKnowledge() != null)</span>
+<span class="nc" id="L168">            .collect(Collectors.groupingBy(</span>
+                Feedback::getSubjectKnowledge,
+<span class="nc" id="L170">                Collectors.counting()</span>
+            )));
+            
+        // Student Support
+<span class="nc" id="L174">        metrics.put(&quot;studentSupport&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">            .filter(f -&gt; f.getStudentSupport() != null)</span>
+<span class="nc" id="L176">            .collect(Collectors.groupingBy(</span>
+                Feedback::getStudentSupport,
+<span class="nc" id="L178">                Collectors.counting()</span>
+            )));
+            
+<span class="nc" id="L181">        return metrics;</span>
+    }
+
+    public List&lt;Feedback&gt; getFeedbackByStudentAndSubject(Student student, Subject subject) {
+<span class="nc" id="L185">        return feedbackRepository.findByStudentAndSubject(student, subject);</span>
+    }
+
+    public Feedback getFeedbackByStudentFacultyAndSubject(Student student, Faculty faculty, Subject subject) {
+<span class="nc" id="L189">        return feedbackRepository.findByStudentAndFacultyAndSubject(student, faculty, subject);</span>
+    }
+
+    public Feedback save(Feedback feedback) {
+<span class="nc" id="L193">        return feedbackRepository.save(feedback);</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

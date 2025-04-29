@@ -12,6 +12,7 @@ import com.ffms.model.Faculty;
 import com.ffms.model.Student;
 import com.ffms.service.FacultyService;
 import com.ffms.service.StudentService;
+import com.ffms.service.SubjectService;
 import com.ffms.exception.RegistrationException;
 
 import jakarta.servlet.http.HttpSession;
@@ -24,6 +25,9 @@ public class AuthController {
 
     @Autowired
     private StudentService studentService;
+
+    @Autowired
+    private SubjectService subjectService;
 
     @GetMapping("/")
     public String home() {
@@ -74,7 +78,9 @@ public class AuthController {
         if (session.getAttribute("facultyId") == null) {
             return "redirect:/faculty/login";
         }
+        Long facultyId = (Long) session.getAttribute("facultyId");
         model.addAttribute("facultyName", session.getAttribute("facultyName"));
+        model.addAttribute("teachingSubjects", subjectService.getSubjectsByFaculty(facultyId));
         return "faculty_dashboard";
     }
 
@@ -122,15 +128,25 @@ public class AuthController {
         if (session.getAttribute("studentId") == null) {
             return "redirect:/student/login";
         }
+        Long studentId = (Long) session.getAttribute("studentId");
         model.addAttribute("studentName", session.getAttribute("studentName"));
+        model.addAttribute("enrolledSubjects", subjectService.getSubjectsByStudent(studentId));
         return "student_dashboard";
     }
 
     // ====================== Logout ======================
 
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
+    @GetMapping("/faculty/logout")
+    public String facultyLogout(HttpSession session) {
+        session.removeAttribute("facultyId");
+        session.removeAttribute("facultyName");
+        return "redirect:/";
+    }
+
+    @GetMapping("/student/logout")
+    public String studentLogout(HttpSession session) {
+        session.removeAttribute("studentId");
+        session.removeAttribute("studentName");
         return "redirect:/";
     }
 }

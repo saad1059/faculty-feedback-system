@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StudentService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">faculty-feedback-system</a> &gt; <a href="index.source.html" class="el_package">com.ffms.service</a> &gt; <span class="el_source">StudentService.java</span></div><h1>StudentService.java</h1><pre class="source lang-java linenums">package com.ffms.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.ffms.model.Student;
+import com.ffms.repository.StudentRepository;
+import com.ffms.exception.RegistrationException;
+import com.ffms.model.Subject;
+import com.ffms.model.Faculty;
+import com.ffms.repository.SubjectRepository;
+import com.ffms.repository.FeedbackRepository;
+import com.ffms.model.Feedback;
+import java.time.LocalDateTime;
+
+import java.util.List;
+
+@Service
+<span class="nc" id="L18">public class StudentService {</span>
+
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private SubjectRepository subjectRepository;
+
+    @Autowired
+    private FeedbackRepository feedbackRepository;
+
+    public List&lt;Student&gt; getAllStudents() {
+<span class="nc" id="L30">        return studentRepository.findAll();</span>
+    }
+
+    public Student registerStudent(Student student) {
+        // Validate input
+<span class="nc" id="L35">        validateStudentRegistration(student);</span>
+
+        // Check for duplicate email
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (studentRepository.findByEmail(student.getEmail()) != null) {</span>
+<span class="nc" id="L39">            throw new RegistrationException(&quot;Email already registered&quot;);</span>
+        }
+
+        // Validate password strength
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (!isPasswordStrong(student.getPassword())) {</span>
+<span class="nc" id="L44">            throw new RegistrationException(&quot;Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character&quot;);</span>
+        }
+
+        // Save the student
+<span class="nc" id="L48">        return studentRepository.save(student);</span>
+    }
+
+    private void validateStudentRegistration(Student student) {
+<span class="nc bnc" id="L52" title="All 4 branches missed.">        if (student.getName() == null || student.getName().trim().isEmpty()) {</span>
+<span class="nc" id="L53">            throw new RegistrationException(&quot;Name is required&quot;);</span>
+        }
+
+<span class="nc bnc" id="L56" title="All 4 branches missed.">        if (student.getEmail() == null || student.getEmail().trim().isEmpty()) {</span>
+<span class="nc" id="L57">            throw new RegistrationException(&quot;Email is required&quot;);</span>
+        }
+
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (!isValidEmail(student.getEmail())) {</span>
+<span class="nc" id="L61">            throw new RegistrationException(&quot;Invalid email format&quot;);</span>
+        }
+
+<span class="nc bnc" id="L64" title="All 4 branches missed.">        if (student.getPassword() == null || student.getPassword().trim().isEmpty()) {</span>
+<span class="nc" id="L65">            throw new RegistrationException(&quot;Password is required&quot;);</span>
+        }
+<span class="nc" id="L67">    }</span>
+
+    private boolean isValidEmail(String email) {
+        // Basic email validation regex
+<span class="nc" id="L71">        String emailRegex = &quot;^[A-Za-z0-9+_.-]+@(.+)$&quot;;</span>
+<span class="nc" id="L72">        return email.matches(emailRegex);</span>
+    }
+
+    private boolean isPasswordStrong(String password) {
+        // Password must be at least 8 characters long
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (password.length() &lt; 8) {</span>
+<span class="nc" id="L78">            return false;</span>
+        }
+
+        // Check for at least one uppercase letter
+<span class="nc" id="L82">        boolean hasUpper = false;</span>
+        // Check for at least one lowercase letter
+<span class="nc" id="L84">        boolean hasLower = false;</span>
+        // Check for at least one number
+<span class="nc" id="L86">        boolean hasNumber = false;</span>
+        // Check for at least one special character
+<span class="nc" id="L88">        boolean hasSpecial = false;</span>
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        for (char c : password.toCharArray()) {</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (Character.isUpperCase(c)) hasUpper = true;</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">            if (Character.isLowerCase(c)) hasLower = true;</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">            if (Character.isDigit(c)) hasNumber = true;</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">            if (!Character.isLetterOrDigit(c)) hasSpecial = true;</span>
+        }
+
+<span class="nc bnc" id="L97" title="All 8 branches missed.">        return hasUpper &amp;&amp; hasLower &amp;&amp; hasNumber &amp;&amp; hasSpecial;</span>
+    }
+
+    public Student loginStudent(String email, String password) {
+<span class="nc" id="L101">        Student student = studentRepository.findByEmail(email);</span>
+<span class="nc bnc" id="L102" title="All 4 branches missed.">        if (student != null &amp;&amp; student.getPassword().equals(password)) {</span>
+<span class="nc" id="L103">            return student;</span>
+        }
+<span class="nc" id="L105">        return null;</span>
+    }
+
+    public Student getStudentById(Long id) {
+<span class="nc" id="L109">        return studentRepository.findById(id).orElse(null);</span>
+    }
+
+    public Student updateStudent(Student student) {
+        // Validate input
+<span class="nc" id="L114">        validateStudentRegistration(student);</span>
+
+        // Check if student exists
+<span class="nc" id="L117">        Student existingStudent = studentRepository.findById(student.getId())</span>
+<span class="nc" id="L118">            .orElseThrow(() -&gt; new RegistrationException(&quot;Student not found&quot;));</span>
+
+        // Check for duplicate email (excluding current student)
+<span class="nc" id="L121">        Student studentWithEmail = studentRepository.findByEmail(student.getEmail());</span>
+<span class="nc bnc" id="L122" title="All 4 branches missed.">        if (studentWithEmail != null &amp;&amp; !studentWithEmail.getId().equals(student.getId())) {</span>
+<span class="nc" id="L123">            throw new RegistrationException(&quot;Email already registered&quot;);</span>
+        }
+
+        // Update password only if it's changed
+<span class="nc bnc" id="L127" title="All 4 branches missed.">        if (student.getPassword() != null &amp;&amp; !student.getPassword().isEmpty()) {</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            if (!isPasswordStrong(student.getPassword())) {</span>
+<span class="nc" id="L129">                throw new RegistrationException(&quot;Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character&quot;);</span>
+            }
+        } else {
+            // Keep existing password if no new password provided
+<span class="nc" id="L133">            student.setPassword(existingStudent.getPassword());</span>
+        }
+
+<span class="nc" id="L136">        return studentRepository.save(student);</span>
+    }
+
+    public void enrollStudentInSubject(Student student, Subject subject, Faculty faculty) {
+        // Check if student is already enrolled in this subject
+<span class="nc bnc" id="L141" title="All 2 branches missed.">        if (student.getSubjects().contains(subject)) {</span>
+<span class="nc" id="L142">            throw new IllegalArgumentException(&quot;Student is already enrolled in this subject&quot;);</span>
+        }
+
+        // If faculty is provided, validate it
+<span class="nc bnc" id="L146" title="All 4 branches missed.">        if (faculty != null &amp;&amp; !subject.getFaculties().contains(faculty)) {</span>
+<span class="nc" id="L147">            throw new IllegalArgumentException(&quot;Faculty is not assigned to this subject&quot;);</span>
+        }
+
+        // Add the subject to student's subjects
+<span class="nc" id="L151">        student.getSubjects().add(subject);</span>
+        
+        // Add the student to subject's students
+<span class="nc" id="L154">        subject.getStudents().add(student);</span>
+        
+        // Only create feedback entry if faculty is selected
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        if (faculty != null) {</span>
+            // Create a new feedback entry to store the selected faculty
+<span class="nc" id="L159">            Feedback feedback = new Feedback();</span>
+<span class="nc" id="L160">            feedback.setStudent(student);</span>
+<span class="nc" id="L161">            feedback.setSubject(subject);</span>
+<span class="nc" id="L162">            feedback.setFaculty(faculty);</span>
+<span class="nc" id="L163">            feedback.setSelectedFaculty(faculty);</span>
+<span class="nc" id="L164">            feedback.setSubmissionDate(LocalDateTime.now());</span>
+<span class="nc" id="L165">            feedbackRepository.save(feedback);</span>
+        }
+        
+        // Save the changes
+<span class="nc" id="L169">        studentRepository.save(student);</span>
+<span class="nc" id="L170">        subjectRepository.save(subject);</span>
+<span class="nc" id="L171">    }</span>
+
+    public void deleteStudent(Long studentId) {
+<span class="nc" id="L174">        Student student = studentRepository.findById(studentId)</span>
+<span class="nc" id="L175">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Student not found&quot;));</span>
+
+        // Remove student from all subjects
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        for (Subject subject : student.getSubjects()) {</span>
+<span class="nc" id="L179">            subject.getStudents().remove(student);</span>
+<span class="nc" id="L180">            subjectRepository.save(subject);</span>
+<span class="nc" id="L181">        }</span>
+
+        // Clear student's subjects
+<span class="nc" id="L184">        student.getSubjects().clear();</span>
+<span class="nc" id="L185">        studentRepository.save(student);</span>
+
+        // Delete all feedback associated with this student
+<span class="nc" id="L188">        feedbackRepository.deleteByStudent(student);</span>
+
+        // Finally, delete the student
+<span class="nc" id="L191">        studentRepository.delete(student);</span>
+<span class="nc" id="L192">    }</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

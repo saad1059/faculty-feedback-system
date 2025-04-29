@@ -5,12 +5,30 @@ import org.springframework.stereotype.Service;
 import com.ffms.model.Student;
 import com.ffms.repository.StudentRepository;
 import com.ffms.exception.RegistrationException;
+import com.ffms.model.Subject;
+import com.ffms.model.Faculty;
+import com.ffms.repository.SubjectRepository;
+import com.ffms.repository.FeedbackRepository;
+import com.ffms.model.Feedback;
+import java.time.LocalDateTime;
+
+import java.util.List;
 
 @Service
 public class StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private SubjectRepository subjectRepository;
+
+    @Autowired
+    private FeedbackRepository feedbackRepository;
+
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
 
     public Student registerStudent(Student student) {
         // Validate input
@@ -116,5 +134,60 @@ public class StudentService {
         }
 
         return studentRepository.save(student);
+    }
+
+    public void enrollStudentInSubject(Student student, Subject subject, Faculty faculty) {
+        // Check if student is already enrolled in this subject
+        if (student.getSubjects().contains(subject)) {
+            throw new IllegalArgumentException("Student is already enrolled in this subject");
+        }
+
+        // If faculty is provided, validate it
+        if (faculty != null && !subject.getFaculties().contains(faculty)) {
+            throw new IllegalArgumentException("Faculty is not assigned to this subject");
+        }
+
+        // Add the subject to student's subjects
+        student.getSubjects().add(subject);
+        
+        // Add the student to subject's students
+        subject.getStudents().add(student);
+        
+        // Only create feedback entry if faculty is selected
+        if (faculty != null) {
+            // Create a new feedback entry to store the selected faculty
+            Feedback feedback = new Feedback();
+            feedback.setStudent(student);
+            feedback.setSubject(subject);
+            feedback.setFaculty(faculty);
+            feedback.setSelectedFaculty(faculty);
+            feedback.setSubmissionDate(LocalDateTime.now());
+            feedbackRepository.save(feedback);
+        }
+        
+        // Save the changes
+        studentRepository.save(student);
+        subjectRepository.save(subject);
+    }
+
+    public void deleteStudent(Long studentId) {
+        Student student = studentRepository.findById(studentId)
+            .orElseThrow(() -> new IllegalArgumentException("Student not found"));
+
+        // Remove student from all subjects
+        for (Subject subject : student.getSubjects()) {
+            subject.getStudents().remove(student);
+            subjectRepository.save(subject);
+        }
+
+        // Clear student's subjects
+        student.getSubjects().clear();
+        studentRepository.save(student);
+
+        // Delete all feedback associated with this student
+        feedbackRepository.deleteByStudent(student);
+
+        // Finally, delete the student
+        studentRepository.delete(student);
     }
 } 

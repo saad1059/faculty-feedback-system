@@ -1,9 +1,8 @@
 package com.ffms.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Student {
@@ -15,6 +14,9 @@ public class Student {
     private String name;
     private String email;
     private String password;
+
+    @ManyToMany(mappedBy = "students")
+    private Set<Subject> subjects = new HashSet<>();
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -28,4 +30,7 @@ public class Student {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public Set<Subject> getSubjects() { return subjects; }
+    public void setSubjects(Set<Subject> subjects) { this.subjects = subjects; }
 }

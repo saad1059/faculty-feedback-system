@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StudentEnrollmentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">faculty-feedback-system</a> &gt; <a href="index.source.html" class="el_package">com.ffms.controller</a> &gt; <span class="el_source">StudentEnrollmentController.java</span></div><h1>StudentEnrollmentController.java</h1><pre class="source lang-java linenums">package com.ffms.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.ffms.service.SubjectService;
+import com.ffms.service.StudentService;
+import com.ffms.exception.RegistrationException;
+
+import jakarta.servlet.http.HttpSession;
+
+@Controller
+@RequestMapping(&quot;/student&quot;)
+<span class="nc" id="L17">public class StudentEnrollmentController {</span>
+
+    @Autowired
+    private SubjectService subjectService;
+
+    @Autowired
+    private StudentService studentService;
+
+    @GetMapping(&quot;/enroll&quot;)
+    public String showEnrollmentPage(Model model, HttpSession session) {
+<span class="nc bnc" id="L27" title="All 2 branches missed.">        if (session.getAttribute(&quot;studentId&quot;) == null) {</span>
+<span class="nc" id="L28">            return &quot;redirect:/student/login&quot;;</span>
+        }
+<span class="nc" id="L30">        Long studentId = (Long) session.getAttribute(&quot;studentId&quot;);</span>
+<span class="nc" id="L31">        model.addAttribute(&quot;availableSubjects&quot;, subjectService.getAvailableSubjectsForStudent(studentId));</span>
+<span class="nc" id="L32">        model.addAttribute(&quot;enrolledSubjects&quot;, subjectService.getSubjectsByStudent(studentId));</span>
+<span class="nc" id="L33">        return &quot;student/enroll&quot;;</span>
+    }
+
+    @PostMapping(&quot;/unenroll/{subjectId}&quot;)
+    public String unenrollFromSubject(@PathVariable Long subjectId, HttpSession session, RedirectAttributes redirectAttributes) {
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (session.getAttribute(&quot;studentId&quot;) == null) {</span>
+<span class="nc" id="L39">            return &quot;redirect:/student/login&quot;;</span>
+        }
+<span class="nc" id="L41">        Long studentId = (Long) session.getAttribute(&quot;studentId&quot;);</span>
+        try {
+<span class="nc" id="L43">            subjectService.removeStudentFromSubject(subjectId, studentId);</span>
+<span class="nc" id="L44">            redirectAttributes.addFlashAttribute(&quot;success&quot;, &quot;Successfully unenrolled from the course&quot;);</span>
+<span class="nc" id="L45">        } catch (RegistrationException e) {</span>
+<span class="nc" id="L46">            redirectAttributes.addFlashAttribute(&quot;error&quot;, e.getMessage());</span>
+<span class="nc" id="L47">        }</span>
+<span class="nc" id="L48">        return &quot;redirect:/student/enroll&quot;;</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

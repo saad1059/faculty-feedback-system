@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>View Feedback</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Feedback Details</h2>
+        <div class="card">
+            <div class="card-body">
+                <div th:if="${feedback != null}">
+                    <h4>Faculty: <span th:text="${faculty.name}"></span></h4>
+                    <h5>Subject: <span th:text="${subject.name}"></span></h5>
+                    <hr>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5>Teaching Skills</h5>
+                            <p>Rating: <span th:text="${feedback.teachingSkills}"></span>/5</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Communication</h5>
+                            <p>Rating: <span th:text="${feedback.communication}"></span>/5</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h5>Helpfulness</h5>
+                            <p>Rating: <span th:text="${feedback.helpfulness}"></span>/5</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Course Content</h5>
+                            <p>Rating: <span th:text="${feedback.courseContent}"></span>/5</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Comments</h5>
+                        <p th:text="${feedback.comments}"></p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Suggestions</h5>
+                        <p th:text="${feedback.suggestions}"></p>
+                    </div>
+                    
+                    <div class="text-muted mt-3">
+                        <small>Submitted on: <span th:text="${#dates.format(feedback.submissionDate, 'dd-MM-yyyy')}"></span></small>
+                    </div>
+                </div>
+                
+                <div th:if="${feedback == null}" class="alert alert-info">
+                    <p>You haven't submitted any feedback for this faculty and subject yet.</p>
+                </div>
+                
+                <div class="mt-4">
+                    <a th:href="@{/student/dashboard}" class="btn btn-primary">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 

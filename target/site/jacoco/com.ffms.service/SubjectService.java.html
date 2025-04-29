@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SubjectService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">faculty-feedback-system</a> &gt; <a href="index.source.html" class="el_package">com.ffms.service</a> &gt; <span class="el_source">SubjectService.java</span></div><h1>SubjectService.java</h1><pre class="source lang-java linenums">package com.ffms.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.ffms.model.Subject;
+import com.ffms.model.Faculty;
+import com.ffms.model.Student;
+import com.ffms.repository.SubjectRepository;
+import com.ffms.repository.FacultyRepository;
+import com.ffms.repository.StudentRepository;
+import com.ffms.exception.RegistrationException;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+<span class="nc" id="L18">public class SubjectService {</span>
+
+    @Autowired
+    private SubjectRepository subjectRepository;
+
+    @Autowired
+    private FacultyRepository facultyRepository;
+
+    @Autowired
+    private StudentRepository studentRepository;
+
+    public List&lt;Subject&gt; getAllSubjects() {
+<span class="nc" id="L30">        return subjectRepository.findAll();</span>
+    }
+
+    public Subject getSubjectById(Long id) {
+<span class="nc" id="L34">        return subjectRepository.findById(id)</span>
+<span class="nc" id="L35">            .orElseThrow(() -&gt; new RegistrationException(&quot;Subject not found&quot;));</span>
+    }
+
+    public Subject createSubject(Subject subject) {
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        if (subjectRepository.findBySubjectCode(subject.getSubjectCode()) != null) {</span>
+<span class="nc" id="L40">            throw new RegistrationException(&quot;Subject code already exists&quot;);</span>
+        }
+<span class="nc" id="L42">        return subjectRepository.save(subject);</span>
+    }
+
+    public Subject updateSubject(Subject subject) {
+<span class="nc" id="L46">        Subject existingSubject = subjectRepository.findById(subject.getId())</span>
+<span class="nc" id="L47">            .orElseThrow(() -&gt; new RegistrationException(&quot;Subject not found&quot;));</span>
+
+<span class="nc" id="L49">        Subject subjectWithCode = subjectRepository.findBySubjectCode(subject.getSubjectCode());</span>
+<span class="nc bnc" id="L50" title="All 4 branches missed.">        if (subjectWithCode != null &amp;&amp; !subjectWithCode.getId().equals(subject.getId())) {</span>
+<span class="nc" id="L51">            throw new RegistrationException(&quot;Subject code already exists&quot;);</span>
+        }
+
+<span class="nc" id="L54">        return subjectRepository.save(subject);</span>
+    }
+
+    public void deleteSubject(Long id) {
+<span class="nc" id="L58">        subjectRepository.deleteById(id);</span>
+<span class="nc" id="L59">    }</span>
+
+    public void assignFacultyToSubject(Long subjectId, Long facultyId) {
+<span class="nc" id="L62">        Subject subject = getSubjectById(subjectId);</span>
+<span class="nc" id="L63">        Faculty faculty = facultyRepository.findById(facultyId)</span>
+<span class="nc" id="L64">            .orElseThrow(() -&gt; new RegistrationException(&quot;Faculty not found&quot;));</span>
+
+<span class="nc" id="L66">        subject.getFaculties().add(faculty);</span>
+<span class="nc" id="L67">        subjectRepository.save(subject);</span>
+<span class="nc" id="L68">    }</span>
+
+    public void removeFacultyFromSubject(Long subjectId, Long facultyId) {
+<span class="nc" id="L71">        Subject subject = getSubjectById(subjectId);</span>
+<span class="nc" id="L72">        Faculty faculty = facultyRepository.findById(facultyId)</span>
+<span class="nc" id="L73">            .orElseThrow(() -&gt; new RegistrationException(&quot;Faculty not found&quot;));</span>
+
+<span class="nc" id="L75">        subject.getFaculties().remove(faculty);</span>
+<span class="nc" id="L76">        subjectRepository.save(subject);</span>
+<span class="nc" id="L77">    }</span>
+
+    public void enrollStudentInSubject(Long subjectId, Long studentId) {
+<span class="nc" id="L80">        Subject subject = getSubjectById(subjectId);</span>
+<span class="nc" id="L81">        Student student = studentRepository.findById(studentId)</span>
+<span class="nc" id="L82">            .orElseThrow(() -&gt; new RegistrationException(&quot;Student not found&quot;));</span>
+
+<span class="nc" id="L84">        subject.getStudents().add(student);</span>
+<span class="nc" id="L85">        subjectRepository.save(subject);</span>
+<span class="nc" id="L86">    }</span>
+
+    public void removeStudentFromSubject(Long subjectId, Long studentId) {
+<span class="nc" id="L89">        Subject subject = getSubjectById(subjectId);</span>
+<span class="nc" id="L90">        Student student = studentRepository.findById(studentId)</span>
+<span class="nc" id="L91">            .orElseThrow(() -&gt; new RegistrationException(&quot;Student not found&quot;));</span>
+
+<span class="nc" id="L93">        subject.getStudents().remove(student);</span>
+<span class="nc" id="L94">        subjectRepository.save(subject);</span>
+<span class="nc" id="L95">    }</span>
+
+    public List&lt;Subject&gt; getSubjectsByFaculty(Long facultyId) {
+<span class="nc" id="L98">        return subjectRepository.findByFacultiesId(facultyId);</span>
+    }
+
+    public List&lt;Subject&gt; getSubjectsByStudent(Long studentId) {
+<span class="nc" id="L102">        return subjectRepository.findByStudentsId(studentId);</span>
+    }
+
+    public Set&lt;Faculty&gt; getFacultiesForSubject(Long subjectId) {
+<span class="nc" id="L106">        return getSubjectById(subjectId).getFaculties();</span>
+    }
+
+    public Set&lt;Student&gt; getStudentsForSubject(Long subjectId) {
+<span class="nc" id="L110">        return getSubjectById(subjectId).getStudents();</span>
+    }
+
+    public List&lt;Subject&gt; getAvailableSubjectsForStudent(Long studentId) {
+<span class="nc" id="L114">        List&lt;Subject&gt; allSubjects = getAllSubjects();</span>
+<span class="nc" id="L115">        List&lt;Subject&gt; enrolledSubjects = getSubjectsByStudent(studentId);</span>
+        
+        // Filter out enrolled subjects and ensure faculties are loaded
+<span class="nc" id="L118">        return allSubjects.stream()</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">            .filter(subject -&gt; !enrolledSubjects.contains(subject))</span>
+<span class="nc" id="L120">            .peek(subject -&gt; {</span>
+                // Force load faculties
+<span class="nc" id="L122">                subject.getFaculties().size();</span>
+<span class="nc" id="L123">            })</span>
+<span class="nc" id="L124">            .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;Subject&gt; getAvailableSubjectsForFaculty(Long facultyId) {
+<span class="nc" id="L128">        List&lt;Subject&gt; allSubjects = getAllSubjects();</span>
+<span class="nc" id="L129">        List&lt;Subject&gt; teachingSubjects = getSubjectsByFaculty(facultyId);</span>
+<span class="nc" id="L130">        return allSubjects.stream()</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">            .filter(subject -&gt; !teachingSubjects.contains(subject))</span>
+<span class="nc" id="L132">            .collect(Collectors.toList());</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

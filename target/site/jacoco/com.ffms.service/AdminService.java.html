@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">faculty-feedback-system</a> &gt; <a href="index.source.html" class="el_package">com.ffms.service</a> &gt; <span class="el_source">AdminService.java</span></div><h1>AdminService.java</h1><pre class="source lang-java linenums">package com.ffms.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.ffms.model.Admin;
+import com.ffms.repository.AdminRepository;
+import java.util.List;
+
+@Service
+<span class="nc" id="L10">public class AdminService {</span>
+
+    @Autowired
+    private AdminRepository adminRepository;
+
+    public Admin registerAdmin(Admin admin) {
+        // Check if username or email already exists
+<span class="nc bnc" id="L17" title="All 2 branches missed.">        if (adminRepository.findByUsername(admin.getUsername()) != null) {</span>
+<span class="nc" id="L18">            throw new RuntimeException(&quot;Username already exists&quot;);</span>
+        }
+<span class="nc bnc" id="L20" title="All 2 branches missed.">        if (adminRepository.findByEmail(admin.getEmail()) != null) {</span>
+<span class="nc" id="L21">            throw new RuntimeException(&quot;Email already exists&quot;);</span>
+        }
+<span class="nc" id="L23">        return adminRepository.save(admin);</span>
+    }
+
+    public Admin loginAdmin(String username, String password) {
+<span class="nc" id="L27">        List&lt;Admin&gt; admins = adminRepository.findAllByUsername(username);</span>
+<span class="nc bnc" id="L28" title="All 4 branches missed.">        if (admins != null &amp;&amp; !admins.isEmpty()) {</span>
+<span class="nc" id="L29">            Admin admin = admins.get(0); // Get the first admin with this username</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">            if (admin.getPassword().equals(password)) {</span>
+<span class="nc" id="L31">                return admin;</span>
+            }
+        }
+<span class="nc" id="L34">        return null;</span>
+    }
+
+    public Admin getAdminById(Long id) {
+<span class="nc" id="L38">        return adminRepository.findById(id).orElse(null);</span>
+    }
+
+    public Admin updateAdmin(Admin admin) {
+<span class="nc" id="L42">        return adminRepository.save(admin);</span>
+    }
+
+    public void deleteAdmin(Long id) {
+<span class="nc" id="L46">        adminRepository.deleteById(id);</span>
+<span class="nc" id="L47">    }</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

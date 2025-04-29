@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FeedbackController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">faculty-feedback-system</a> &gt; <a href="index.source.html" class="el_package">com.ffms.controller</a> &gt; <span class="el_source">FeedbackController.java</span></div><h1>FeedbackController.java</h1><pre class="source lang-java linenums">package com.ffms.controller;
+
+import com.ffms.model.Faculty;
+import com.ffms.model.Feedback;
+import com.ffms.model.Student;
+import com.ffms.model.Subject;
+import com.ffms.service.FacultyService;
+import com.ffms.service.FeedbackService;
+import com.ffms.service.StudentService;
+import com.ffms.service.SubjectService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.servlet.http.HttpSession;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.HashMap;
+
+@Controller
+@RequestMapping(&quot;/feedback&quot;)
+<span class="nc" id="L26">public class FeedbackController {</span>
+
+    @Autowired
+    private FeedbackService feedbackService;
+
+    @Autowired
+    private FacultyService facultyService;
+
+    @Autowired
+    private StudentService studentService;
+
+    @Autowired
+    private SubjectService subjectService;
+
+    // Student feedback form
+    @GetMapping(&quot;/student/form/{facultyId}/{subjectId}&quot;)
+    public String showFeedbackForm(@PathVariable Long facultyId, 
+                                 @PathVariable Long subjectId,
+                                 HttpSession session,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        if (session.getAttribute(&quot;studentId&quot;) == null) {</span>
+<span class="nc" id="L48">            return &quot;redirect:/student/login&quot;;</span>
+        }
+
+<span class="nc" id="L51">        Long studentId = (Long) session.getAttribute(&quot;studentId&quot;);</span>
+<span class="nc" id="L52">        Student student = studentService.getStudentById(studentId);</span>
+<span class="nc" id="L53">        Faculty faculty = facultyService.getFacultyById(facultyId);</span>
+<span class="nc" id="L54">        Subject subject = subjectService.getSubjectById(subjectId);</span>
+
+        // Check if student has already submitted feedback for this faculty and subject
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (feedbackService.hasSubmittedFeedback(student, subject)) {</span>
+<span class="nc" id="L58">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;You have already submitted feedback for this subject in the last 5 minutes. Please try again later.&quot;);</span>
+<span class="nc" id="L59">            return &quot;redirect:/student/dashboard&quot;;</span>
+        }
+
+        // Check if student is enrolled in the subject
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (!student.getSubjects().contains(subject)) {</span>
+<span class="nc" id="L64">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;You are not enrolled in this subject.&quot;);</span>
+<span class="nc" id="L65">            return &quot;redirect:/student/dashboard&quot;;</span>
+        }
+
+        // Check if faculty is assigned to the subject
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (!subject.getFaculties().contains(faculty)) {</span>
+<span class="nc" id="L70">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;This faculty is not assigned to this subject.&quot;);</span>
+<span class="nc" id="L71">            return &quot;redirect:/student/dashboard&quot;;</span>
+        }
+
+<span class="nc" id="L74">        model.addAttribute(&quot;student&quot;, student);</span>
+<span class="nc" id="L75">        model.addAttribute(&quot;faculty&quot;, faculty);</span>
+<span class="nc" id="L76">        model.addAttribute(&quot;subject&quot;, subject);</span>
+<span class="nc" id="L77">        model.addAttribute(&quot;feedback&quot;, new Feedback());</span>
+
+<span class="nc" id="L79">        return &quot;student/feedback_form&quot;;</span>
+    }
+
+    // Submit feedback
+    @PostMapping(&quot;/student/submit&quot;)
+    public String submitFeedback(@ModelAttribute Feedback feedback,
+                               @RequestParam(&quot;faculty.id&quot;) Long facultyId,
+                               @RequestParam(&quot;subject.id&quot;) Long subjectId,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+<span class="nc bnc" id="L89" title="All 2 branches missed.">        if (session.getAttribute(&quot;studentId&quot;) == null) {</span>
+<span class="nc" id="L90">            return &quot;redirect:/student/login&quot;;</span>
+        }
+
+<span class="nc" id="L93">        Long studentId = (Long) session.getAttribute(&quot;studentId&quot;);</span>
+<span class="nc" id="L94">        Student student = studentService.getStudentById(studentId);</span>
+<span class="nc" id="L95">        Faculty faculty = facultyService.getFacultyById(facultyId);</span>
+<span class="nc" id="L96">        Subject subject = subjectService.getSubjectById(subjectId);</span>
+
+        // Check if student has already submitted feedback for this faculty and subject
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (feedbackService.hasSubmittedFeedback(student, subject)) {</span>
+<span class="nc" id="L100">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;You have already submitted feedback for this subject in the last 5 minutes. Please try again later.&quot;);</span>
+<span class="nc" id="L101">            return &quot;redirect:/student/dashboard&quot;;</span>
+        }
+
+        // Check if student is enrolled in the subject
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (!student.getSubjects().contains(subject)) {</span>
+<span class="nc" id="L106">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;You are not enrolled in this subject.&quot;);</span>
+<span class="nc" id="L107">            return &quot;redirect:/student/dashboard&quot;;</span>
+        }
+
+        // Check if faculty is assigned to the subject
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (!subject.getFaculties().contains(faculty)) {</span>
+<span class="nc" id="L112">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;This faculty is not assigned to this subject.&quot;);</span>
+<span class="nc" id="L113">            return &quot;redirect:/student/dashboard&quot;;</span>
+        }
+
+<span class="nc" id="L116">        feedback.setStudent(student);</span>
+<span class="nc" id="L117">        feedback.setFaculty(faculty);</span>
+<span class="nc" id="L118">        feedback.setSubject(subject);</span>
+<span class="nc" id="L119">        feedback.setSubmissionDate(LocalDateTime.now());</span>
+
+<span class="nc" id="L121">        feedbackService.submitFeedback(feedback);</span>
+<span class="nc" id="L122">        redirectAttributes.addFlashAttribute(&quot;success&quot;, &quot;Feedback submitted successfully!&quot;);</span>
+<span class="nc" id="L123">        return &quot;redirect:/student/dashboard&quot;;</span>
+    }
+
+    // Faculty view all feedback
+    @GetMapping(&quot;/faculty/view&quot;)
+    public String viewFeedback(HttpSession session, Model model) {
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        if (session.getAttribute(&quot;facultyId&quot;) == null) {</span>
+<span class="nc" id="L130">            return &quot;redirect:/faculty/login&quot;;</span>
+        }
+
+<span class="nc" id="L133">        Long facultyId = (Long) session.getAttribute(&quot;facultyId&quot;);</span>
+<span class="nc" id="L134">        Faculty faculty = facultyService.getFacultyById(facultyId);</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (faculty == null) {</span>
+<span class="nc" id="L136">            return &quot;redirect:/faculty/login&quot;;</span>
+        }
+
+        // Get all feedback for this faculty
+<span class="nc" id="L140">        List&lt;Feedback&gt; feedbacks = feedbackService.getFeedbackByFaculty(faculty);</span>
+        
+        // Calculate metrics
+<span class="nc" id="L143">        Map&lt;String, Map&lt;String, Long&gt;&gt; feedbackMetrics = feedbackService.getFeedbackMetricsByFaculty(faculty);</span>
+<span class="nc" id="L144">        Map&lt;String, Map&lt;String, Long&gt;&gt; detailedMetrics = feedbackService.getDetailedMetricsByFaculty(faculty);</span>
+        
+        // Calculate subject-wise metrics with subject IDs
+<span class="nc" id="L147">        Map&lt;String, Map&lt;String, Object&gt;&gt; subjectWiseMetrics = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        for (Subject subject : faculty.getSubjects()) {</span>
+<span class="nc" id="L149">            List&lt;Feedback&gt; subjectFeedbacks = feedbackService.getFeedbackByFacultyAndSubject(faculty, subject);</span>
+<span class="nc" id="L150">            Map&lt;String, Long&gt; subjectRatings = subjectFeedbacks.stream()</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">                .filter(f -&gt; f.getOverallRating() != null)</span>
+<span class="nc" id="L152">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getOverallRating,
+<span class="nc" id="L154">                    Collectors.counting()</span>
+                ));
+            
+<span class="nc" id="L157">            Map&lt;String, Object&gt; subjectData = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L158">            subjectData.put(&quot;ratings&quot;, subjectRatings);</span>
+<span class="nc" id="L159">            subjectData.put(&quot;id&quot;, subject.getId());</span>
+<span class="nc" id="L160">            subjectWiseMetrics.put(subject.getSubjectName(), subjectData);</span>
+<span class="nc" id="L161">        }</span>
+
+<span class="nc" id="L163">        model.addAttribute(&quot;faculty&quot;, faculty);</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">        model.addAttribute(&quot;feedbackMetrics&quot;, feedbackMetrics != null ? feedbackMetrics.get(&quot;overall&quot;) : new HashMap&lt;&gt;());</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        model.addAttribute(&quot;detailedMetrics&quot;, detailedMetrics != null ? detailedMetrics : new HashMap&lt;&gt;());</span>
+<span class="nc" id="L166">        model.addAttribute(&quot;subjectWiseMetrics&quot;, subjectWiseMetrics);</span>
+<span class="nc" id="L167">        model.addAttribute(&quot;totalFeedbacks&quot;, feedbacks.size());</span>
+
+<span class="nc" id="L169">        return &quot;faculty/feedback_analysis&quot;;</span>
+    }
+
+    // Faculty view feedback for specific subject
+    @GetMapping(&quot;/faculty/feedback/{subjectId}&quot;)
+    public String viewSubjectFeedback(@PathVariable Long subjectId, 
+                                    HttpSession session, 
+                                    Model model,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+<span class="nc bnc" id="L179" title="All 2 branches missed.">            if (session.getAttribute(&quot;facultyId&quot;) == null) {</span>
+<span class="nc" id="L180">                return &quot;redirect:/faculty/login&quot;;</span>
+            }
+
+<span class="nc" id="L183">            Long facultyId = (Long) session.getAttribute(&quot;facultyId&quot;);</span>
+<span class="nc" id="L184">            Faculty faculty = facultyService.getFacultyById(facultyId);</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">            if (faculty == null) {</span>
+<span class="nc" id="L186">                return &quot;redirect:/faculty/login&quot;;</span>
+            }
+
+<span class="nc" id="L189">            Subject subject = subjectService.getSubjectById(subjectId);</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">            if (subject == null) {</span>
+<span class="nc" id="L191">                redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;Subject not found&quot;);</span>
+<span class="nc" id="L192">                return &quot;redirect:/feedback/faculty/view&quot;;</span>
+            }
+
+            // Verify that the faculty is assigned to this subject
+<span class="nc bnc" id="L196" title="All 2 branches missed.">            if (!subject.getFaculties().contains(faculty)) {</span>
+<span class="nc" id="L197">                redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;You are not assigned to this subject&quot;);</span>
+<span class="nc" id="L198">                return &quot;redirect:/feedback/faculty/view&quot;;</span>
+            }
+
+            // Get feedback for this faculty and subject
+<span class="nc" id="L202">            List&lt;Feedback&gt; feedbacks = feedbackService.getFeedbackByFacultyAndSubject(faculty, subject);</span>
+            
+            // Calculate metrics for this subject
+<span class="nc" id="L205">            Map&lt;String, Map&lt;String, Long&gt;&gt; feedbackMetrics = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L206">            Map&lt;String, Long&gt; overallRatings = feedbacks.stream()</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">                .filter(f -&gt; f.getOverallRating() != null)</span>
+<span class="nc" id="L208">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getOverallRating,
+<span class="nc" id="L210">                    Collectors.counting()</span>
+                ));
+<span class="nc" id="L212">            feedbackMetrics.put(&quot;overall&quot;, overallRatings);</span>
+
+<span class="nc" id="L214">            Map&lt;String, Map&lt;String, Long&gt;&gt; detailedMetrics = new HashMap&lt;&gt;();</span>
+            // Punctuality
+<span class="nc" id="L216">            detailedMetrics.put(&quot;punctuality&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">                .filter(f -&gt; f.getPunctuality() != null)</span>
+<span class="nc" id="L218">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getPunctuality,
+<span class="nc" id="L220">                    Collectors.counting()</span>
+                )));
+            // Class Participation
+<span class="nc" id="L223">            detailedMetrics.put(&quot;classParticipation&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">                .filter(f -&gt; f.getClassParticipation() != null)</span>
+<span class="nc" id="L225">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getClassParticipation,
+<span class="nc" id="L227">                    Collectors.counting()</span>
+                )));
+            // Concept Delivery
+<span class="nc" id="L230">            detailedMetrics.put(&quot;conceptDelivery&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">                .filter(f -&gt; f.getConceptDelivery() != null)</span>
+<span class="nc" id="L232">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getConceptDelivery,
+<span class="nc" id="L234">                    Collectors.counting()</span>
+                )));
+            // Fair Evaluation
+<span class="nc" id="L237">            detailedMetrics.put(&quot;fairEvaluation&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">                .filter(f -&gt; f.getFairEvaluation() != null)</span>
+<span class="nc" id="L239">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getFairEvaluation,
+<span class="nc" id="L241">                    Collectors.counting()</span>
+                )));
+            // Social Issues
+<span class="nc" id="L244">            detailedMetrics.put(&quot;socialIssues&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">                .filter(f -&gt; f.getSocialIssues() != null)</span>
+<span class="nc" id="L246">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getSocialIssues,
+<span class="nc" id="L248">                    Collectors.counting()</span>
+                )));
+            // Communication
+<span class="nc" id="L251">            detailedMetrics.put(&quot;communication&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L252" title="All 2 branches missed.">                .filter(f -&gt; f.getCommunication() != null)</span>
+<span class="nc" id="L253">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getCommunication,
+<span class="nc" id="L255">                    Collectors.counting()</span>
+                )));
+            // Teaching Methodology
+<span class="nc" id="L258">            detailedMetrics.put(&quot;teachingMethodology&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">                .filter(f -&gt; f.getTeachingMethodology() != null)</span>
+<span class="nc" id="L260">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getTeachingMethodology,
+<span class="nc" id="L262">                    Collectors.counting()</span>
+                )));
+            // Subject Knowledge
+<span class="nc" id="L265">            detailedMetrics.put(&quot;subjectKnowledge&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">                .filter(f -&gt; f.getSubjectKnowledge() != null)</span>
+<span class="nc" id="L267">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getSubjectKnowledge,
+<span class="nc" id="L269">                    Collectors.counting()</span>
+                )));
+            // Student Support
+<span class="nc" id="L272">            detailedMetrics.put(&quot;studentSupport&quot;, feedbacks.stream()</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">                .filter(f -&gt; f.getStudentSupport() != null)</span>
+<span class="nc" id="L274">                .collect(Collectors.groupingBy(</span>
+                    Feedback::getStudentSupport,
+<span class="nc" id="L276">                    Collectors.counting()</span>
+                )));
+
+<span class="nc" id="L279">            model.addAttribute(&quot;faculty&quot;, faculty);</span>
+<span class="nc" id="L280">            model.addAttribute(&quot;subject&quot;, subject);</span>
+<span class="nc" id="L281">            model.addAttribute(&quot;feedbacks&quot;, feedbacks);</span>
+<span class="nc" id="L282">            model.addAttribute(&quot;feedbackMetrics&quot;, feedbackMetrics.get(&quot;overall&quot;));</span>
+<span class="nc" id="L283">            model.addAttribute(&quot;detailedMetrics&quot;, detailedMetrics);</span>
+<span class="nc" id="L284">            model.addAttribute(&quot;totalFeedbacks&quot;, feedbacks.size());</span>
+
+<span class="nc" id="L286">            return &quot;faculty/subject_feedback&quot;;</span>
+<span class="nc" id="L287">        } catch (Exception e) {</span>
+<span class="nc" id="L288">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;Error viewing feedback: &quot; + e.getMessage());</span>
+<span class="nc" id="L289">            return &quot;redirect:/feedback/faculty/view&quot;;</span>
+        }
+    }
+
+    // Admin view all feedback
+    @GetMapping(&quot;/admin/view&quot;)
+    public String adminViewFeedback(Model model) {
+<span class="nc" id="L296">        model.addAttribute(&quot;allFeedback&quot;, feedbackService.getAllFeedback());</span>
+<span class="nc" id="L297">        return &quot;admin/feedback_list&quot;;</span>
+    }
+
+    // Student view their feedback
+    @GetMapping(&quot;/student/view/{facultyId}/{subjectId}&quot;)
+    public String viewStudentFeedback(@PathVariable Long facultyId, 
+                                    @PathVariable Long subjectId,
+                                    Model model,
+                                    HttpSession session) {
+<span class="nc bnc" id="L306" title="All 2 branches missed.">        if (session.getAttribute(&quot;studentId&quot;) == null) {</span>
+<span class="nc" id="L307">            return &quot;redirect:/student/login&quot;;</span>
+        }
+
+<span class="nc" id="L310">        Long studentId = (Long) session.getAttribute(&quot;studentId&quot;);</span>
+<span class="nc" id="L311">        Student student = studentService.getStudentById(studentId);</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">        if (student == null) {</span>
+<span class="nc" id="L313">            return &quot;redirect:/student/login&quot;;</span>
+        }
+
+<span class="nc" id="L316">        Faculty faculty = facultyService.getFacultyById(facultyId);</span>
+<span class="nc" id="L317">        Subject subject = subjectService.getSubjectById(subjectId);</span>
+        
+<span class="nc bnc" id="L319" title="All 4 branches missed.">        if (faculty == null || subject == null) {</span>
+<span class="nc" id="L320">            return &quot;redirect:/student/dashboard&quot;;</span>
+        }
+
+<span class="nc" id="L323">        Feedback feedback = feedbackService.getFeedbackByStudentFacultyAndSubject(student, faculty, subject);</span>
+<span class="nc" id="L324">        model.addAttribute(&quot;feedback&quot;, feedback);</span>
+<span class="nc" id="L325">        model.addAttribute(&quot;faculty&quot;, faculty);</span>
+<span class="nc" id="L326">        model.addAttribute(&quot;subject&quot;, subject);</span>
+        
+<span class="nc" id="L328">        return &quot;student/view_feedback&quot;;</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

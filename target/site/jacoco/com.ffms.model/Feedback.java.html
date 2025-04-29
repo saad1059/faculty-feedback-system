@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Feedback.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">faculty-feedback-system</a> &gt; <a href="index.source.html" class="el_package">com.ffms.model</a> &gt; <span class="el_source">Feedback.java</span></div><h1>Feedback.java</h1><pre class="source lang-java linenums">package com.ffms.model;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = &quot;feedback&quot;)
+<span class="fc" id="L8">public class Feedback {</span>
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = &quot;student_id&quot;)
+    private Student student;
+
+    @ManyToOne
+    @JoinColumn(name = &quot;faculty_id&quot;)
+    private Faculty faculty;
+
+    @ManyToOne
+    @JoinColumn(name = &quot;subject_id&quot;)
+    private Subject subject;
+
+    @ManyToOne
+    @JoinColumn(name = &quot;selected_faculty_id&quot;)
+    private Faculty selectedFaculty;
+
+    private LocalDateTime submissionDate;
+
+    // Feedback metrics
+    private String punctuality;
+    private String classParticipation;
+    private String conceptDelivery;
+    private String fairEvaluation;
+    private String socialIssues;
+    private String communication;
+    private String teachingMethodology;
+    private String subjectKnowledge;
+    private String studentSupport;
+    private String overallRating;
+    private int rating;
+
+    // Getters and Setters
+    public Long getId() {
+<span class="fc" id="L46">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L50">        this.id = id;</span>
+<span class="fc" id="L51">    }</span>
+
+    public Student getStudent() {
+<span class="fc" id="L54">        return student;</span>
+    }
+
+    public void setStudent(Student student) {
+<span class="fc" id="L58">        this.student = student;</span>
+<span class="fc" id="L59">    }</span>
+
+    public Faculty getFaculty() {
+<span class="fc" id="L62">        return faculty;</span>
+    }
+
+    public void setFaculty(Faculty faculty) {
+<span class="fc" id="L66">        this.faculty = faculty;</span>
+<span class="fc" id="L67">    }</span>
+
+    public Subject getSubject() {
+<span class="fc" id="L70">        return subject;</span>
+    }
+
+    public void setSubject(Subject subject) {
+<span class="fc" id="L74">        this.subject = subject;</span>
+<span class="fc" id="L75">    }</span>
+
+    public Faculty getSelectedFaculty() {
+<span class="fc" id="L78">        return selectedFaculty;</span>
+    }
+
+    public void setSelectedFaculty(Faculty selectedFaculty) {
+<span class="fc" id="L82">        this.selectedFaculty = selectedFaculty;</span>
+<span class="fc" id="L83">    }</span>
+
+    public LocalDateTime getSubmissionDate() {
+<span class="fc" id="L86">        return submissionDate;</span>
+    }
+
+    public void setSubmissionDate(LocalDateTime submissionDate) {
+<span class="fc" id="L90">        this.submissionDate = submissionDate;</span>
+<span class="fc" id="L91">    }</span>
+
+    public String getPunctuality() {
+<span class="fc" id="L94">        return punctuality;</span>
+    }
+
+    public void setPunctuality(String punctuality) {
+<span class="fc" id="L98">        this.punctuality = punctuality;</span>
+<span class="fc" id="L99">    }</span>
+
+    public String getClassParticipation() {
+<span class="fc" id="L102">        return classParticipation;</span>
+    }
+
+    public void setClassParticipation(String classParticipation) {
+<span class="fc" id="L106">        this.classParticipation = classParticipation;</span>
+<span class="fc" id="L107">    }</span>
+
+    public String getConceptDelivery() {
+<span class="fc" id="L110">        return conceptDelivery;</span>
+    }
+
+    public void setConceptDelivery(String conceptDelivery) {
+<span class="fc" id="L114">        this.conceptDelivery = conceptDelivery;</span>
+<span class="fc" id="L115">    }</span>
+
+    public String getFairEvaluation() {
+<span class="fc" id="L118">        return fairEvaluation;</span>
+    }
+
+    public void setFairEvaluation(String fairEvaluation) {
+<span class="fc" id="L122">        this.fairEvaluation = fairEvaluation;</span>
+<span class="fc" id="L123">    }</span>
+
+    public String getSocialIssues() {
+<span class="fc" id="L126">        return socialIssues;</span>
+    }
+
+    public void setSocialIssues(String socialIssues) {
+<span class="fc" id="L130">        this.socialIssues = socialIssues;</span>
+<span class="fc" id="L131">    }</span>
+
+    public String getCommunication() {
+<span class="fc" id="L134">        return communication;</span>
+    }
+
+    public void setCommunication(String communication) {
+<span class="fc" id="L138">        this.communication = communication;</span>
+<span class="fc" id="L139">    }</span>
+
+    public String getTeachingMethodology() {
+<span class="fc" id="L142">        return teachingMethodology;</span>
+    }
+
+    public void setTeachingMethodology(String teachingMethodology) {
+<span class="fc bfc" id="L146" title="All 4 branches covered.">        if (teachingMethodology == null || teachingMethodology.trim().isEmpty()) {</span>
+<span class="fc" id="L147">            throw new IllegalArgumentException(&quot;Feedback cannot be empty&quot;);</span>
+        }
+<span class="fc" id="L149">        this.teachingMethodology = teachingMethodology;</span>
+<span class="fc" id="L150">    }</span>
+
+    public String getSubjectKnowledge() {
+<span class="fc" id="L153">        return subjectKnowledge;</span>
+    }
+
+    public void setSubjectKnowledge(String subjectKnowledge) {
+<span class="fc bfc" id="L157" title="All 4 branches covered.">        if (subjectKnowledge == null || subjectKnowledge.trim().isEmpty()) {</span>
+<span class="fc" id="L158">            throw new IllegalArgumentException(&quot;Feedback cannot be empty&quot;);</span>
+        }
+<span class="fc" id="L160">        this.subjectKnowledge = subjectKnowledge;</span>
+<span class="fc" id="L161">    }</span>
+
+    public String getStudentSupport() {
+<span class="fc" id="L164">        return studentSupport;</span>
+    }
+
+    public void setStudentSupport(String studentSupport) {
+<span class="fc bfc" id="L168" title="All 4 branches covered.">        if (studentSupport == null || studentSupport.trim().isEmpty()) {</span>
+<span class="fc" id="L169">            throw new IllegalArgumentException(&quot;Feedback cannot be empty&quot;);</span>
+        }
+<span class="fc" id="L171">        this.studentSupport = studentSupport;</span>
+<span class="fc" id="L172">    }</span>
+
+    public String getOverallRating() {
+<span class="fc" id="L175">        return overallRating;</span>
+    }
+
+    public void setOverallRating(String overallRating) {
+<span class="fc" id="L179">        this.overallRating = overallRating;</span>
+<span class="fc" id="L180">    }</span>
+
+    public int getRating() {
+<span class="fc" id="L183">        return rating;</span>
+    }
+
+    public void setRating(int rating) {
+<span class="fc bfc" id="L187" title="All 4 branches covered.">        if (rating &lt; 1 || rating &gt; 5) {</span>
+<span class="fc" id="L188">            throw new IllegalArgumentException(&quot;Invalid rating: Rating must be between 1 and 5&quot;);</span>
+        }
+<span class="fc" id="L190">        this.rating = rating;</span>
+<span class="fc" id="L191">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
