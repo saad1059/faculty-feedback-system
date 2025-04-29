@@ -7,13 +7,17 @@ import com.ffms.model.Feedback;
 import com.ffms.model.Student;
 import com.ffms.model.Faculty;
 import com.ffms.model.Subject;
+import com.ffms.model.Admin;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 public class WhiteBoxTests {
     private Feedback feedback;
     private Student student;
     private Faculty faculty;
     private Subject subject;
+    private Admin admin;
 
     @BeforeEach
     void setUp() {
@@ -21,11 +25,13 @@ public class WhiteBoxTests {
         student = new Student();
         faculty = new Faculty();
         subject = new Subject();
+        admin = new Admin();
         
         // Setup basic test data
         student.setId(1L);
         faculty.setId(1L);
         subject.setId(1L);
+        admin.setId(1L);
     }
 
     // Statement Coverage Tests
@@ -180,5 +186,133 @@ public class WhiteBoxTests {
         assertEquals("Excellent", feedback.getSubjectKnowledge());
         assertEquals("Very Good", feedback.getStudentSupport());
         assertEquals(4, feedback.getRating());
+    }
+
+    // Additional Model Tests
+    @Test
+    void testStudentModel() {
+        student.setName("John Doe");
+        student.setEmail("john@example.com");
+        student.setPassword("password123");
+        
+        assertEquals("John Doe", student.getName());
+        assertEquals("john@example.com", student.getEmail());
+        assertEquals("password123", student.getPassword());
+        
+        Set<Subject> subjects = new HashSet<>();
+        subjects.add(subject);
+        student.setSubjects(subjects);
+        
+        assertTrue(student.getSubjects().contains(subject));
+    }
+
+    @Test
+    void testFacultyModel() {
+        faculty.setName("Dr. Smith");
+        faculty.setEmail("smith@example.com");
+        faculty.setPassword("faculty123");
+        
+        assertEquals("Dr. Smith", faculty.getName());
+        assertEquals("smith@example.com", faculty.getEmail());
+        assertEquals("faculty123", faculty.getPassword());
+        
+        Set<Subject> subjects = new HashSet<>();
+        subjects.add(subject);
+        faculty.setSubjects(subjects);
+        
+        assertTrue(faculty.getSubjects().contains(subject));
+    }
+
+    @Test
+    void testSubjectModel() {
+        subject.setSubjectCode("CS101");
+        subject.setSubjectName("Introduction to Programming");
+        subject.setDescription("Basic programming concepts");
+        subject.setCredits(3);
+        
+        assertEquals("CS101", subject.getSubjectCode());
+        assertEquals("Introduction to Programming", subject.getSubjectName());
+        assertEquals("Basic programming concepts", subject.getDescription());
+        assertEquals(3, subject.getCredits());
+        
+        Set<Faculty> faculties = new HashSet<>();
+        faculties.add(faculty);
+        subject.setFaculties(faculties);
+        
+        Set<Student> students = new HashSet<>();
+        students.add(student);
+        subject.setStudents(students);
+        
+        assertTrue(subject.getFaculties().contains(faculty));
+        assertTrue(subject.getStudents().contains(student));
+    }
+
+    @Test
+    void testAdminModel() {
+        admin.setUsername("admin");
+        admin.setPassword("admin123");
+        admin.setEmail("admin@example.com");
+        admin.setName("System Admin");
+        
+        assertEquals("admin", admin.getUsername());
+        assertEquals("admin123", admin.getPassword());
+        assertEquals("admin@example.com", admin.getEmail());
+        assertEquals("System Admin", admin.getName());
+    }
+
+    // Relationship Tests
+    @Test
+    void testStudentSubjectRelationship() {
+        Set<Subject> subjects = new HashSet<>();
+        subjects.add(subject);
+        student.setSubjects(subjects);
+        
+        Set<Student> students = new HashSet<>();
+        students.add(student);
+        subject.setStudents(students);
+        
+        assertTrue(student.getSubjects().contains(subject));
+        assertTrue(subject.getStudents().contains(student));
+    }
+
+    @Test
+    void testFacultySubjectRelationship() {
+        Set<Subject> subjects = new HashSet<>();
+        subjects.add(subject);
+        faculty.setSubjects(subjects);
+        
+        Set<Faculty> faculties = new HashSet<>();
+        faculties.add(faculty);
+        subject.setFaculties(faculties);
+        
+        assertTrue(faculty.getSubjects().contains(subject));
+        assertTrue(subject.getFaculties().contains(faculty));
+    }
+
+    // Edge Cases
+    @Test
+    void testEmptySets() {
+        student.setSubjects(new HashSet<>());
+        faculty.setSubjects(new HashSet<>());
+        subject.setStudents(new HashSet<>());
+        subject.setFaculties(new HashSet<>());
+        
+        assertTrue(student.getSubjects().isEmpty());
+        assertTrue(faculty.getSubjects().isEmpty());
+        assertTrue(subject.getStudents().isEmpty());
+        assertTrue(subject.getFaculties().isEmpty());
+    }
+
+    @Test
+    void testNullValues() {
+        student.setName(null);
+        faculty.setName(null);
+        subject.setSubjectName(null);
+        admin.setName(null);
+        
+        assertNull(student.getName());
+        assertNull(faculty.getName());
+        assertNull(subject.getSubjectName());
+        assertNull(admin.getName());
     }
 } 

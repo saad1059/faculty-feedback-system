@@ -1,2 +1,4 @@
 com\ffms\BlackBoxTests.class
+com\ffms\ControllerLayerTests.class
+com\ffms\ServiceLayerTests.class
 com\ffms\WhiteBoxTests.class

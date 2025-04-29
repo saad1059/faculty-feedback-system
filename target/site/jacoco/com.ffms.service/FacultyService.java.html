@@ -9,7 +9,7 @@ import com.ffms.exception.RegistrationException;
 import java.util.List;
 
 @Service
-<span class="nc" id="L12">public class FacultyService {</span>
+<span class="fc" id="L12">public class FacultyService {</span>
 
     @Autowired
     private FacultyRepository facultyRepository;
@@ -25,20 +25,20 @@ import java.util.List;
 
     public Faculty registerFaculty(Faculty faculty) {
         // Validate input
-<span class="nc" id="L28">        validateFacultyRegistration(faculty);</span>
+<span class="fc" id="L28">        validateFacultyRegistration(faculty);</span>
 
         // Check for duplicate email
-<span class="nc bnc" id="L31" title="All 2 branches missed.">        if (facultyRepository.findByEmail(faculty.getEmail()) != null) {</span>
-<span class="nc" id="L32">            throw new RegistrationException(&quot;Email already registered&quot;);</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        if (facultyRepository.findByEmail(faculty.getEmail()) != null) {</span>
+<span class="fc" id="L32">            throw new RegistrationException(&quot;Email already registered&quot;);</span>
         }
 
         // Validate password strength
-<span class="nc bnc" id="L36" title="All 2 branches missed.">        if (!isPasswordStrong(faculty.getPassword())) {</span>
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        if (!isPasswordStrong(faculty.getPassword())) {</span>
 <span class="nc" id="L37">            throw new RegistrationException(&quot;Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character&quot;);</span>
         }
 
         // Save the faculty
-<span class="nc" id="L41">        return facultyRepository.save(faculty);</span>
+<span class="fc" id="L41">        return facultyRepository.save(faculty);</span>
     }
 
     public Faculty updateFaculty(Faculty faculty) {
@@ -73,25 +73,25 @@ import java.util.List;
 <span class="nc" id="L73">    }</span>
 
     private void validateFacultyRegistration(Faculty faculty) {
-<span class="nc bnc" id="L76" title="All 4 branches missed.">        if (faculty.getName() == null || faculty.getName().trim().isEmpty()) {</span>
+<span class="pc bpc" id="L76" title="2 of 4 branches missed.">        if (faculty.getName() == null || faculty.getName().trim().isEmpty()) {</span>
 <span class="nc" id="L77">            throw new RegistrationException(&quot;Name is required&quot;);</span>
         }
 
-<span class="nc bnc" id="L80" title="All 4 branches missed.">        if (faculty.getEmail() == null || faculty.getEmail().trim().isEmpty()) {</span>
+<span class="pc bpc" id="L80" title="2 of 4 branches missed.">        if (faculty.getEmail() == null || faculty.getEmail().trim().isEmpty()) {</span>
 <span class="nc" id="L81">            throw new RegistrationException(&quot;Email is required&quot;);</span>
         }
 
-<span class="nc bnc" id="L84" title="All 2 branches missed.">        if (!isValidEmail(faculty.getEmail())) {</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (!isValidEmail(faculty.getEmail())) {</span>
 <span class="nc" id="L85">            throw new RegistrationException(&quot;Invalid email format&quot;);</span>
         }
 
-<span class="nc bnc" id="L88" title="All 6 branches missed.">        if (faculty.getId() == null &amp;&amp; (faculty.getPassword() == null || faculty.getPassword().trim().isEmpty())) {</span>
+<span class="pc bpc" id="L88" title="5 of 6 branches missed.">        if (faculty.getId() == null &amp;&amp; (faculty.getPassword() == null || faculty.getPassword().trim().isEmpty())) {</span>
 <span class="nc" id="L89">            throw new RegistrationException(&quot;Password is required&quot;);</span>
         }
-<span class="nc" id="L91">    }</span>
+<span class="fc" id="L91">    }</span>
 
     private boolean isValidEmail(String email) {
-<span class="nc" id="L94">        return email.matches(&quot;^[A-Za-z0-9+_.-]+@(.+)$&quot;);</span>
+<span class="fc" id="L94">        return email.matches(&quot;^[A-Za-z0-9+_.-]+@(.+)$&quot;);</span>
     }
 
     private boolean isPasswordStrong(String password) {
@@ -100,15 +100,15 @@ import java.util.List;
         // Contains at least one lowercase letter
         // Contains at least one number
         // Contains at least one special character
-<span class="nc" id="L103">        return password.matches(&quot;^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&amp;])[A-Za-z\\d@$!%*?&amp;]{8,}$&quot;);</span>
+<span class="fc" id="L103">        return password.matches(&quot;^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&amp;])[A-Za-z\\d@$!%*?&amp;]{8,}$&quot;);</span>
     }
 
     public Faculty loginFaculty(String email, String password) {
-<span class="nc" id="L107">        Faculty faculty = facultyRepository.findByEmail(email);</span>
-<span class="nc bnc" id="L108" title="All 4 branches missed.">        if (faculty != null &amp;&amp; faculty.getPassword().equals(password)) {</span>
-<span class="nc" id="L109">            return faculty;</span>
+<span class="fc" id="L107">        Faculty faculty = facultyRepository.findByEmail(email);</span>
+<span class="pc bpc" id="L108" title="2 of 4 branches missed.">        if (faculty != null &amp;&amp; faculty.getPassword().equals(password)) {</span>
+<span class="fc" id="L109">            return faculty;</span>
         }
 <span class="nc" id="L111">        return null;</span>
     }
 } 
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

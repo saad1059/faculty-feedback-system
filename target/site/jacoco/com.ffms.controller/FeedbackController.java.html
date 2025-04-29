@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 @Controller
 @RequestMapping(&quot;/feedback&quot;)
-<span class="nc" id="L26">public class FeedbackController {</span>
+<span class="fc" id="L26">public class FeedbackController {</span>
 
     @Autowired
     private FeedbackService feedbackService;
@@ -86,41 +86,41 @@ import java.util.HashMap;
                                @RequestParam(&quot;subject.id&quot;) Long subjectId,
                                HttpSession session,
                                RedirectAttributes redirectAttributes) {
-<span class="nc bnc" id="L89" title="All 2 branches missed.">        if (session.getAttribute(&quot;studentId&quot;) == null) {</span>
-<span class="nc" id="L90">            return &quot;redirect:/student/login&quot;;</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        if (session.getAttribute(&quot;studentId&quot;) == null) {</span>
+<span class="fc" id="L90">            return &quot;redirect:/student/login&quot;;</span>
         }
 
-<span class="nc" id="L93">        Long studentId = (Long) session.getAttribute(&quot;studentId&quot;);</span>
-<span class="nc" id="L94">        Student student = studentService.getStudentById(studentId);</span>
-<span class="nc" id="L95">        Faculty faculty = facultyService.getFacultyById(facultyId);</span>
-<span class="nc" id="L96">        Subject subject = subjectService.getSubjectById(subjectId);</span>
+<span class="fc" id="L93">        Long studentId = (Long) session.getAttribute(&quot;studentId&quot;);</span>
+<span class="fc" id="L94">        Student student = studentService.getStudentById(studentId);</span>
+<span class="fc" id="L95">        Faculty faculty = facultyService.getFacultyById(facultyId);</span>
+<span class="fc" id="L96">        Subject subject = subjectService.getSubjectById(subjectId);</span>
 
         // Check if student has already submitted feedback for this faculty and subject
-<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (feedbackService.hasSubmittedFeedback(student, subject)) {</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">        if (feedbackService.hasSubmittedFeedback(student, subject)) {</span>
 <span class="nc" id="L100">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;You have already submitted feedback for this subject in the last 5 minutes. Please try again later.&quot;);</span>
 <span class="nc" id="L101">            return &quot;redirect:/student/dashboard&quot;;</span>
         }
 
         // Check if student is enrolled in the subject
-<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (!student.getSubjects().contains(subject)) {</span>
-<span class="nc" id="L106">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;You are not enrolled in this subject.&quot;);</span>
-<span class="nc" id="L107">            return &quot;redirect:/student/dashboard&quot;;</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (!student.getSubjects().contains(subject)) {</span>
+<span class="fc" id="L106">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;You are not enrolled in this subject.&quot;);</span>
+<span class="fc" id="L107">            return &quot;redirect:/student/dashboard&quot;;</span>
         }
 
         // Check if faculty is assigned to the subject
-<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (!subject.getFaculties().contains(faculty)) {</span>
-<span class="nc" id="L112">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;This faculty is not assigned to this subject.&quot;);</span>
-<span class="nc" id="L113">            return &quot;redirect:/student/dashboard&quot;;</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        if (!subject.getFaculties().contains(faculty)) {</span>
+<span class="fc" id="L112">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;This faculty is not assigned to this subject.&quot;);</span>
+<span class="fc" id="L113">            return &quot;redirect:/student/dashboard&quot;;</span>
         }
 
-<span class="nc" id="L116">        feedback.setStudent(student);</span>
-<span class="nc" id="L117">        feedback.setFaculty(faculty);</span>
-<span class="nc" id="L118">        feedback.setSubject(subject);</span>
-<span class="nc" id="L119">        feedback.setSubmissionDate(LocalDateTime.now());</span>
+<span class="fc" id="L116">        feedback.setStudent(student);</span>
+<span class="fc" id="L117">        feedback.setFaculty(faculty);</span>
+<span class="fc" id="L118">        feedback.setSubject(subject);</span>
+<span class="fc" id="L119">        feedback.setSubmissionDate(LocalDateTime.now());</span>
 
-<span class="nc" id="L121">        feedbackService.submitFeedback(feedback);</span>
-<span class="nc" id="L122">        redirectAttributes.addFlashAttribute(&quot;success&quot;, &quot;Feedback submitted successfully!&quot;);</span>
-<span class="nc" id="L123">        return &quot;redirect:/student/dashboard&quot;;</span>
+<span class="fc" id="L121">        feedbackService.submitFeedback(feedback);</span>
+<span class="fc" id="L122">        redirectAttributes.addFlashAttribute(&quot;success&quot;, &quot;Feedback submitted successfully!&quot;);</span>
+<span class="fc" id="L123">        return &quot;redirect:/student/dashboard&quot;;</span>
     }
 
     // Faculty view all feedback
@@ -328,4 +328,4 @@ import java.util.HashMap;
 <span class="nc" id="L328">        return &quot;student/view_feedback&quot;;</span>
     }
 } 
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

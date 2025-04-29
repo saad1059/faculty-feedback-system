@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-<span class="nc" id="L18">public class StudentService {</span>
+<span class="fc" id="L18">public class StudentService {</span>
 
     @Autowired
     private StudentRepository studentRepository;
@@ -32,75 +32,75 @@ import java.util.List;
 
     public Student registerStudent(Student student) {
         // Validate input
-<span class="nc" id="L35">        validateStudentRegistration(student);</span>
+<span class="fc" id="L35">        validateStudentRegistration(student);</span>
 
         // Check for duplicate email
-<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (studentRepository.findByEmail(student.getEmail()) != null) {</span>
-<span class="nc" id="L39">            throw new RegistrationException(&quot;Email already registered&quot;);</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if (studentRepository.findByEmail(student.getEmail()) != null) {</span>
+<span class="fc" id="L39">            throw new RegistrationException(&quot;Email already registered&quot;);</span>
         }
 
         // Validate password strength
-<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (!isPasswordStrong(student.getPassword())) {</span>
-<span class="nc" id="L44">            throw new RegistrationException(&quot;Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character&quot;);</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (!isPasswordStrong(student.getPassword())) {</span>
+<span class="fc" id="L44">            throw new RegistrationException(&quot;Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character&quot;);</span>
         }
 
         // Save the student
-<span class="nc" id="L48">        return studentRepository.save(student);</span>
+<span class="fc" id="L48">        return studentRepository.save(student);</span>
     }
 
     private void validateStudentRegistration(Student student) {
-<span class="nc bnc" id="L52" title="All 4 branches missed.">        if (student.getName() == null || student.getName().trim().isEmpty()) {</span>
-<span class="nc" id="L53">            throw new RegistrationException(&quot;Name is required&quot;);</span>
+<span class="pc bpc" id="L52" title="1 of 4 branches missed.">        if (student.getName() == null || student.getName().trim().isEmpty()) {</span>
+<span class="fc" id="L53">            throw new RegistrationException(&quot;Name is required&quot;);</span>
         }
 
-<span class="nc bnc" id="L56" title="All 4 branches missed.">        if (student.getEmail() == null || student.getEmail().trim().isEmpty()) {</span>
+<span class="pc bpc" id="L56" title="2 of 4 branches missed.">        if (student.getEmail() == null || student.getEmail().trim().isEmpty()) {</span>
 <span class="nc" id="L57">            throw new RegistrationException(&quot;Email is required&quot;);</span>
         }
 
-<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (!isValidEmail(student.getEmail())) {</span>
-<span class="nc" id="L61">            throw new RegistrationException(&quot;Invalid email format&quot;);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (!isValidEmail(student.getEmail())) {</span>
+<span class="fc" id="L61">            throw new RegistrationException(&quot;Invalid email format&quot;);</span>
         }
 
-<span class="nc bnc" id="L64" title="All 4 branches missed.">        if (student.getPassword() == null || student.getPassword().trim().isEmpty()) {</span>
+<span class="pc bpc" id="L64" title="2 of 4 branches missed.">        if (student.getPassword() == null || student.getPassword().trim().isEmpty()) {</span>
 <span class="nc" id="L65">            throw new RegistrationException(&quot;Password is required&quot;);</span>
         }
-<span class="nc" id="L67">    }</span>
+<span class="fc" id="L67">    }</span>
 
     private boolean isValidEmail(String email) {
         // Basic email validation regex
-<span class="nc" id="L71">        String emailRegex = &quot;^[A-Za-z0-9+_.-]+@(.+)$&quot;;</span>
-<span class="nc" id="L72">        return email.matches(emailRegex);</span>
+<span class="fc" id="L71">        String emailRegex = &quot;^[A-Za-z0-9+_.-]+@(.+)$&quot;;</span>
+<span class="fc" id="L72">        return email.matches(emailRegex);</span>
     }
 
     private boolean isPasswordStrong(String password) {
         // Password must be at least 8 characters long
-<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (password.length() &lt; 8) {</span>
-<span class="nc" id="L78">            return false;</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if (password.length() &lt; 8) {</span>
+<span class="fc" id="L78">            return false;</span>
         }
 
         // Check for at least one uppercase letter
-<span class="nc" id="L82">        boolean hasUpper = false;</span>
+<span class="fc" id="L82">        boolean hasUpper = false;</span>
         // Check for at least one lowercase letter
-<span class="nc" id="L84">        boolean hasLower = false;</span>
+<span class="fc" id="L84">        boolean hasLower = false;</span>
         // Check for at least one number
-<span class="nc" id="L86">        boolean hasNumber = false;</span>
+<span class="fc" id="L86">        boolean hasNumber = false;</span>
         // Check for at least one special character
-<span class="nc" id="L88">        boolean hasSpecial = false;</span>
+<span class="fc" id="L88">        boolean hasSpecial = false;</span>
 
-<span class="nc bnc" id="L90" title="All 2 branches missed.">        for (char c : password.toCharArray()) {</span>
-<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (Character.isUpperCase(c)) hasUpper = true;</span>
-<span class="nc bnc" id="L92" title="All 2 branches missed.">            if (Character.isLowerCase(c)) hasLower = true;</span>
-<span class="nc bnc" id="L93" title="All 2 branches missed.">            if (Character.isDigit(c)) hasNumber = true;</span>
-<span class="nc bnc" id="L94" title="All 2 branches missed.">            if (!Character.isLetterOrDigit(c)) hasSpecial = true;</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        for (char c : password.toCharArray()) {</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">            if (Character.isUpperCase(c)) hasUpper = true;</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">            if (Character.isLowerCase(c)) hasLower = true;</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">            if (Character.isDigit(c)) hasNumber = true;</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">            if (!Character.isLetterOrDigit(c)) hasSpecial = true;</span>
         }
 
-<span class="nc bnc" id="L97" title="All 8 branches missed.">        return hasUpper &amp;&amp; hasLower &amp;&amp; hasNumber &amp;&amp; hasSpecial;</span>
+<span class="pc bpc" id="L97" title="4 of 8 branches missed.">        return hasUpper &amp;&amp; hasLower &amp;&amp; hasNumber &amp;&amp; hasSpecial;</span>
     }
 
     public Student loginStudent(String email, String password) {
-<span class="nc" id="L101">        Student student = studentRepository.findByEmail(email);</span>
-<span class="nc bnc" id="L102" title="All 4 branches missed.">        if (student != null &amp;&amp; student.getPassword().equals(password)) {</span>
-<span class="nc" id="L103">            return student;</span>
+<span class="fc" id="L101">        Student student = studentRepository.findByEmail(email);</span>
+<span class="pc bpc" id="L102" title="2 of 4 branches missed.">        if (student != null &amp;&amp; student.getPassword().equals(password)) {</span>
+<span class="fc" id="L103">            return student;</span>
         }
 <span class="nc" id="L105">        return null;</span>
     }
@@ -191,4 +191,4 @@ import java.util.List;
 <span class="nc" id="L191">        studentRepository.delete(student);</span>
 <span class="nc" id="L192">    }</span>
 } 
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

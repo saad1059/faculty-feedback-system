@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 @Controller
 @RequestMapping(&quot;/student&quot;)
-<span class="nc" id="L25">public class StudentController {</span>
+<span class="fc" id="L25">public class StudentController {</span>
 
     @Autowired
     private StudentService studentService;
@@ -41,23 +41,23 @@ import java.util.ArrayList;
                                @RequestParam(required = false) Map&lt;String, String&gt; facultySelections,
                                HttpSession session,
                                RedirectAttributes redirectAttributes) {
-<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (session.getAttribute(&quot;studentId&quot;) == null) {</span>
-<span class="nc" id="L45">            return &quot;redirect:/student/login&quot;;</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (session.getAttribute(&quot;studentId&quot;) == null) {</span>
+<span class="fc" id="L45">            return &quot;redirect:/student/login&quot;;</span>
         }
 
-<span class="nc" id="L48">        Long studentId = (Long) session.getAttribute(&quot;studentId&quot;);</span>
-<span class="nc" id="L49">        Student student = studentService.getStudentById(studentId);</span>
+<span class="fc" id="L48">        Long studentId = (Long) session.getAttribute(&quot;studentId&quot;);</span>
+<span class="fc" id="L49">        Student student = studentService.getStudentById(studentId);</span>
 
         try {
             // If no subjects selected, return with error
-<span class="nc bnc" id="L53" title="All 4 branches missed.">            if (subjects == null || subjects.isEmpty()) {</span>
+<span class="pc bpc" id="L53" title="2 of 4 branches missed.">            if (subjects == null || subjects.isEmpty()) {</span>
 <span class="nc" id="L54">                redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;Please select a subject to enroll&quot;);</span>
 <span class="nc" id="L55">                return &quot;redirect:/student/enroll&quot;;</span>
             }
 
             // Process the selected subject
-<span class="nc bnc" id="L59" title="All 2 branches missed.">            for (Map.Entry&lt;String, String&gt; entry : subjects.entrySet()) {</span>
-<span class="nc" id="L60">                String subjectIdStr = entry.getValue(); // The value is the subject ID</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">            for (Map.Entry&lt;String, String&gt; entry : subjects.entrySet()) {</span>
+<span class="fc" id="L60">                String subjectIdStr = entry.getValue(); // The value is the subject ID</span>
 <span class="nc bnc" id="L61" title="All 4 branches missed.">                if (subjectIdStr == null || subjectIdStr.isEmpty()) {</span>
 <span class="nc" id="L62">                    continue; // Skip if no subject ID</span>
                 }
@@ -96,9 +96,9 @@ import java.util.ArrayList;
             }
             
 <span class="nc" id="L98">            return &quot;redirect:/student/dashboard&quot;;</span>
-<span class="nc" id="L99">        } catch (Exception e) {</span>
-<span class="nc" id="L100">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;Error during enrollment: &quot; + e.getMessage());</span>
-<span class="nc" id="L101">            return &quot;redirect:/student/enroll&quot;;</span>
+<span class="fc" id="L99">        } catch (Exception e) {</span>
+<span class="fc" id="L100">            redirectAttributes.addFlashAttribute(&quot;error&quot;, &quot;Error during enrollment: &quot; + e.getMessage());</span>
+<span class="fc" id="L101">            return &quot;redirect:/student/enroll&quot;;</span>
         }
     }
 
@@ -211,4 +211,4 @@ import java.util.ArrayList;
 <span class="nc" id="L211">        return &quot;student/feedback_form&quot;;</span>
     }
 } 
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

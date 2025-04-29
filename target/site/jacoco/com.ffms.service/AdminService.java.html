@@ -7,28 +7,28 @@ import com.ffms.repository.AdminRepository;
 import java.util.List;
 
 @Service
-<span class="nc" id="L10">public class AdminService {</span>
+<span class="fc" id="L10">public class AdminService {</span>
 
     @Autowired
     private AdminRepository adminRepository;
 
     public Admin registerAdmin(Admin admin) {
         // Check if username or email already exists
-<span class="nc bnc" id="L17" title="All 2 branches missed.">        if (adminRepository.findByUsername(admin.getUsername()) != null) {</span>
-<span class="nc" id="L18">            throw new RuntimeException(&quot;Username already exists&quot;);</span>
+<span class="fc bfc" id="L17" title="All 2 branches covered.">        if (adminRepository.findByUsername(admin.getUsername()) != null) {</span>
+<span class="fc" id="L18">            throw new RuntimeException(&quot;Username already exists&quot;);</span>
         }
-<span class="nc bnc" id="L20" title="All 2 branches missed.">        if (adminRepository.findByEmail(admin.getEmail()) != null) {</span>
+<span class="pc bpc" id="L20" title="1 of 2 branches missed.">        if (adminRepository.findByEmail(admin.getEmail()) != null) {</span>
 <span class="nc" id="L21">            throw new RuntimeException(&quot;Email already exists&quot;);</span>
         }
-<span class="nc" id="L23">        return adminRepository.save(admin);</span>
+<span class="fc" id="L23">        return adminRepository.save(admin);</span>
     }
 
     public Admin loginAdmin(String username, String password) {
-<span class="nc" id="L27">        List&lt;Admin&gt; admins = adminRepository.findAllByUsername(username);</span>
-<span class="nc bnc" id="L28" title="All 4 branches missed.">        if (admins != null &amp;&amp; !admins.isEmpty()) {</span>
-<span class="nc" id="L29">            Admin admin = admins.get(0); // Get the first admin with this username</span>
-<span class="nc bnc" id="L30" title="All 2 branches missed.">            if (admin.getPassword().equals(password)) {</span>
-<span class="nc" id="L31">                return admin;</span>
+<span class="fc" id="L27">        List&lt;Admin&gt; admins = adminRepository.findAllByUsername(username);</span>
+<span class="pc bpc" id="L28" title="2 of 4 branches missed.">        if (admins != null &amp;&amp; !admins.isEmpty()) {</span>
+<span class="fc" id="L29">            Admin admin = admins.get(0); // Get the first admin with this username</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">            if (admin.getPassword().equals(password)) {</span>
+<span class="fc" id="L31">                return admin;</span>
             }
         }
 <span class="nc" id="L34">        return null;</span>
@@ -46,4 +46,4 @@ import java.util.List;
 <span class="nc" id="L46">        adminRepository.deleteById(id);</span>
 <span class="nc" id="L47">    }</span>
 } 
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
